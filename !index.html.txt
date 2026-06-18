@@ -1,0 +1,841 @@
+<!index.html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>NutriGain – Weight Gain Diet Planner</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f5f5f0;
+      --surface: #ffffff;
+      --surface2: #f0efe9;
+      --border: rgba(0,0,0,0.12);
+      --border2: rgba(0,0,0,0.22);
+      --text: #1a1a1a;
+      --text2: #555550;
+      --text3: #999994;
+      --blue: #185FA5;
+      --blue-bg: #E6F1FB;
+      --blue-text: #0C447C;
+      --green: #3B6D11;
+      --green-bg: #EAF3DE;
+      --green-border: #C0DD97;
+      --purple: #534AB7;
+      --amber-bg: #FAEEDA;
+      --amber-text: #854F0B;
+      --radius: 10px;
+      --radius-lg: 14px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1a1a18;
+        --surface: #252523;
+        --surface2: #2e2e2b;
+        --border: rgba(255,255,255,0.1);
+        --border2: rgba(255,255,255,0.2);
+        --text: #f0efe9;
+        --text2: #a8a8a0;
+        --text3: #666660;
+        --blue-bg: #0C2A4A;
+        --blue-text: #85B7EB;
+        --green-bg: #173404;
+        --green-border: #3B6D11;
+        --green: #97C459;
+        --amber-bg: #412402;
+        --amber-text: #EF9F27;
+      }
+    }
+
+    html, body { height: 100%; background: var(--bg); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--text); }
+
+    .app {
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+    }
+
+    /* HEADER */
+    .header {
+      background: var(--surface);
+      border-bottom: 0.5px solid var(--border);
+      padding: 16px 16px 12px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 3px; }
+    .header h1 { font-size: 20px; font-weight: 600; color: var(--text); letter-spacing: -0.3px; }
+    .badge { background: var(--green-bg); color: var(--green); font-size: 11px; padding: 3px 9px; border-radius: 20px; font-weight: 600; border: 0.5px solid var(--green-border); }
+    .header p { font-size: 13px; color: var(--text2); }
+
+    /* NAV */
+    .nav {
+      display: flex;
+      background: var(--surface);
+      border-bottom: 0.5px solid var(--border);
+      position: sticky;
+      top: 61px;
+      z-index: 10;
+    }
+    .nav-btn {
+      flex: 1;
+      padding: 10px 4px 8px;
+      font-size: 11px;
+      background: none;
+      border: none;
+      border-bottom: 2.5px solid transparent;
+      color: var(--text3);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      transition: color 0.15s, border-color 0.15s;
+      font-family: inherit;
+    }
+    .nav-btn.active { color: var(--blue); border-bottom-color: var(--blue); font-weight: 600; }
+    .nav-btn i { font-size: 20px; }
+
+    /* SCREENS */
+    .screen { display: none; padding: 14px; flex: 1; overflow-y: auto; }
+    .screen.active { display: block; }
+
+    /* SECTION TITLE */
+    .section-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin: 16px 0 8px;
+    }
+    .section-title:first-child { margin-top: 4px; }
+
+    /* CALORIE GOAL BAR */
+    .goal-bar {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      border: 0.5px solid var(--border);
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+    .goal-nums { display: flex; justify-content: space-between; font-size: 13px; color: var(--text2); margin-bottom: 8px; }
+    .goal-nums strong { color: var(--text); font-weight: 600; }
+    .progress-bar { height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+    .goal-sub { font-size: 12px; color: var(--text3); margin-top: 6px; }
+
+    /* MACRO CARDS */
+    .macro-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
+    .macro-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 0.5px solid var(--border);
+      padding: 11px 8px 10px;
+      text-align: center;
+    }
+    .macro-card .val { font-size: 18px; font-weight: 600; color: var(--text); }
+    .macro-card .lbl { font-size: 12px; color: var(--text2); margin-top: 1px; }
+    .macro-card .sub { font-size: 10px; color: var(--text3); margin-top: 1px; }
+    .macro-card .mini-bar { height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; margin-top: 6px; }
+    .macro-card .mini-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
+
+    /* MEAL BLOCKS */
+    .meal-block {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      border: 0.5px solid var(--border);
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .meal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .meal-name { font-size: 15px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 7px; }
+    .meal-name i { color: var(--blue); }
+    .meal-cal { font-size: 13px; color: var(--text2); }
+    .meal-items { padding: 6px 14px 10px; }
+    .meal-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 0;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .meal-item:last-child { border-bottom: none; }
+    .item-name { font-size: 14px; color: var(--text); }
+    .item-meta { font-size: 11px; color: var(--text3); margin-top: 2px; }
+    .item-cal { font-size: 14px; font-weight: 600; color: var(--text); }
+    .empty-msg { font-size: 13px; color: var(--text3); padding: 8px 0 4px; }
+    .delete-btn { background: none; border: none; color: var(--text3); cursor: pointer; padding: 5px; font-size: 16px; margin-left: 6px; transition: color 0.15s; }
+    .delete-btn:hover { color: #A32D2D; }
+
+    /* ADD ITEM ROW */
+    .add-row {
+      display: flex;
+      gap: 6px;
+      padding: 8px 10px;
+      background: var(--surface2);
+    }
+    .add-row input {
+      flex: 1;
+      font-size: 13px;
+      padding: 8px 10px;
+      background: var(--surface);
+      border: 0.5px solid var(--border2);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: inherit;
+      outline: none;
+    }
+    .add-row input:focus { border-color: var(--blue); }
+    .add-row input::placeholder { color: var(--text3); }
+    .btn-sm {
+      font-size: 12px;
+      padding: 8px 12px;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: inherit;
+      font-weight: 500;
+      transition: opacity 0.15s;
+    }
+    .btn-sm:active { opacity: 0.8; }
+    .btn-ai { background: var(--purple); }
+
+    /* TIP CARD */
+    .tip-card {
+      background: var(--green-bg);
+      border-radius: var(--radius-lg);
+      border: 0.5px solid var(--green-border);
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+    .tip-title { font-size: 13px; font-weight: 600; color: var(--green); display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+    .tip-title i { font-size: 16px; }
+    .tip-card p { font-size: 13px; color: var(--green); line-height: 1.55; }
+
+    /* SCAN SCREEN */
+    .text-input-area {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      border: 0.5px solid var(--border);
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+    .text-input-area label { font-size: 13px; color: var(--text2); margin-bottom: 8px; display: block; font-weight: 500; }
+    .text-input-area textarea {
+      width: 100%;
+      background: var(--surface2);
+      border: 0.5px solid var(--border2);
+      border-radius: var(--radius);
+      padding: 11px 12px;
+      font-size: 14px;
+      color: var(--text);
+      resize: none;
+      font-family: inherit;
+      line-height: 1.5;
+      outline: none;
+    }
+    .text-input-area textarea:focus { border-color: var(--blue); }
+    .text-input-area textarea::placeholder { color: var(--text3); }
+    .analyze-btn {
+      width: 100%;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      padding: 13px;
+      font-size: 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 10px;
+      font-family: inherit;
+      font-weight: 500;
+      transition: opacity 0.15s;
+    }
+    .analyze-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .analyze-btn:active { opacity: 0.85; }
+
+    /* LOADING DOTS */
+    .loading-dots { display: inline-flex; gap: 5px; align-items: center; }
+    .loading-dots span { width: 6px; height: 6px; background: #fff; border-radius: 50%; animation: bounce 1s infinite; }
+    .loading-dots span:nth-child(2) { animation-delay: 0.15s; }
+    .loading-dots span:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes bounce { 0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-7px)} }
+
+    /* RESULT CARD */
+    .result-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      border: 0.5px solid var(--border);
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .result-head {
+      background: var(--blue-bg);
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .result-head i { font-size: 22px; color: var(--blue); flex-shrink: 0; }
+    .result-head .food-name { font-size: 15px; font-weight: 600; color: var(--blue-text); }
+    .result-head .food-qty { font-size: 12px; color: var(--blue); margin-top: 1px; }
+    .result-head .total-cal { margin-left: auto; font-size: 26px; font-weight: 700; color: var(--blue-text); white-space: nowrap; }
+    .result-head .cal-lbl { font-size: 11px; color: var(--blue); text-align: right; }
+    .macro-row { display: flex; padding: 12px 14px; }
+    .macro-pill { flex: 1; text-align: center; }
+    .macro-pill .mp-val { font-size: 17px; font-weight: 600; color: var(--text); }
+    .macro-pill .mp-lbl { font-size: 11px; color: var(--text2); margin-top: 2px; }
+    .macro-pill + .macro-pill { border-left: 0.5px solid var(--border); }
+    .tag { display: inline-block; font-size: 11px; padding: 3px 9px; border-radius: 20px; margin-right: 4px; margin-bottom: 4px; font-weight: 500; }
+    .tag-green { background: var(--green-bg); color: var(--green); }
+    .tag-amber { background: var(--amber-bg); color: var(--amber-text); }
+    .result-tip { font-size: 13px; color: var(--text2); padding: 0 14px 14px; line-height: 1.5; }
+    .action-row { display: flex; gap: 8px; padding: 0 14px 14px; }
+    .btn-add {
+      flex: 1;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      padding: 11px;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-family: inherit;
+      font-weight: 500;
+      transition: opacity 0.15s;
+    }
+    .btn-add:active { opacity: 0.85; }
+    .btn-add.lunch { background: var(--purple); }
+
+    /* PROFILE */
+    .profile-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      border: 0.5px solid var(--border);
+      padding: 16px;
+      margin-bottom: 10px;
+    }
+    .profile-avatar {
+      width: 54px; height: 54px; border-radius: 50%;
+      background: var(--blue-bg);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 12px;
+    }
+    .profile-avatar i { font-size: 30px; color: var(--blue); }
+    .profile-name { font-size: 16px; font-weight: 600; color: var(--text); }
+    .profile-sub { font-size: 13px; color: var(--text2); margin-top: 2px; }
+    .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+    .stat-box { background: var(--surface2); border-radius: var(--radius); padding: 10px 6px; text-align: center; }
+    .stat-box .sv { font-size: 16px; font-weight: 600; color: var(--text); }
+    .stat-box .sl { font-size: 11px; color: var(--text2); margin-top: 2px; }
+    .btn-full {
+      width: 100%;
+      background: none;
+      border: 0.5px solid var(--border2);
+      color: var(--text);
+      padding: 12px 14px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: inherit;
+      transition: background 0.15s;
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+    .btn-full:hover { background: var(--surface2); }
+    .btn-full i { color: var(--purple); }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #1a1a1a;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 100;
+      white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* API KEY INPUT */
+    .api-note {
+      background: var(--amber-bg);
+      border-radius: var(--radius);
+      border: 0.5px solid var(--amber-text);
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--amber-text);
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+    .api-note a { color: var(--amber-text); font-weight: 600; }
+    .api-key-input {
+      width: 100%;
+      font-size: 13px;
+      padding: 9px 12px;
+      background: var(--surface);
+      border: 0.5px solid var(--border2);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: inherit;
+      outline: none;
+      margin-top: 8px;
+    }
+    .api-key-input:focus { border-color: var(--blue); }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <h1>NutriGain</h1>
+      <span class="badge">Weight Gain Mode</span>
+    </div>
+    <p>21 yrs · 5'9" · 43 kg → Target: 65 kg</p>
+  </div>
+
+  <!-- NAV -->
+  <nav class="nav" role="navigation" aria-label="Main">
+    <button class="nav-btn active" onclick="showTab('dashboard')" id="nav-dashboard">
+      <i class="ti ti-home" aria-hidden="true"></i> Dashboard
+    </button>
+    <button class="nav-btn" onclick="showTab('plan')" id="nav-plan">
+      <i class="ti ti-clipboard-list" aria-hidden="true"></i> Meal Plan
+    </button>
+    <button class="nav-btn" onclick="showTab('scan')" id="nav-scan">
+      <i class="ti ti-calculator" aria-hidden="true"></i> Calories
+    </button>
+    <button class="nav-btn" onclick="showTab('profile')" id="nav-profile">
+      <i class="ti ti-user" aria-hidden="true"></i> Profile
+    </button>
+  </nav>
+
+  <!-- DASHBOARD -->
+  <div class="screen active" id="screen-dashboard">
+    <div class="section-title">Today's calories</div>
+    <div class="goal-bar">
+      <div class="goal-nums">
+        <span>Eaten <strong id="eaten-cals">0</strong> kcal</span>
+        <span>Goal <strong>3,200</strong> kcal</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="cal-progress" style="width:0%;background:#185FA5;"></div>
+      </div>
+      <div class="goal-sub" id="cal-remaining">3,200 kcal remaining today</div>
+    </div>
+
+    <div class="section-title">Macros</div>
+    <div class="macro-grid">
+      <div class="macro-card">
+        <div class="val" id="d-protein">0g</div>
+        <div class="lbl">Protein</div>
+        <div class="sub">target 150g</div>
+        <div class="mini-bar"><div class="mini-fill" id="p-bar" style="width:0%;background:#639922;"></div></div>
+      </div>
+      <div class="macro-card">
+        <div class="val" id="d-carbs">0g</div>
+        <div class="lbl">Carbs</div>
+        <div class="sub">target 450g</div>
+        <div class="mini-bar"><div class="mini-fill" id="c-bar" style="width:0%;background:#BA7517;"></div></div>
+      </div>
+      <div class="macro-card">
+        <div class="val" id="d-fat">0g</div>
+        <div class="lbl">Fat</div>
+        <div class="sub">target 90g</div>
+        <div class="mini-bar"><div class="mini-fill" id="f-bar" style="width:0%;background:#D4537E;"></div></div>
+      </div>
+    </div>
+
+    <div class="section-title">Today's meals</div>
+    <div id="dashboard-meals"></div>
+
+    <div class="tip-card">
+      <div class="tip-title"><i class="ti ti-bulb" aria-hidden="true"></i> Daily tip</div>
+      <p>To gain weight healthily, aim for a 500–700 kcal surplus daily. Eat every 3–4 hours and prioritize protein at each meal to build muscle, not just fat.</p>
+    </div>
+  </div>
+
+  <!-- MEAL PLAN -->
+  <div class="screen" id="screen-plan">
+    <div class="section-title">Today's meal plan</div>
+    <div id="meal-plan-blocks"></div>
+  </div>
+
+  <!-- CALORIE CALCULATOR -->
+  <div class="screen" id="screen-scan">
+    <div class="api-note" id="api-setup">
+      <strong>⚡ Setup required</strong> — To use the AI calorie calculator, enter your free Anthropic API key below.<br>
+      Get one at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>
+      <input class="api-key-input" id="api-key-input" type="password" placeholder="sk-ant-..." oninput="saveApiKey()" />
+    </div>
+
+    <div class="text-input-area">
+      <label>Describe your food or meal</label>
+      <textarea id="food-input" rows="3" placeholder="e.g. 2 boiled eggs with 2 slices of brown bread and butter, a glass of whole milk..."></textarea>
+      <button class="analyze-btn" id="analyze-btn" onclick="analyzeMeal()">
+        <i class="ti ti-calculator" aria-hidden="true"></i> Calculate calories
+      </button>
+    </div>
+
+    <div id="scan-result"></div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="screen" id="screen-profile">
+    <div class="section-title">Your profile</div>
+    <div class="profile-card">
+      <div class="profile-avatar"><i class="ti ti-user" aria-hidden="true"></i></div>
+      <div class="profile-name">Your stats</div>
+      <div class="profile-sub">21 years · Mixed diet · Underweight</div>
+      <div class="stat-grid">
+        <div class="stat-box"><div class="sv">43 kg</div><div class="sl">Current</div></div>
+        <div class="stat-box"><div class="sv">65 kg</div><div class="sl">Target</div></div>
+        <div class="stat-box"><div class="sv">+22 kg</div><div class="sl">To gain</div></div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-box"><div class="sv">5'9"</div><div class="sl">Height</div></div>
+        <div class="stat-box"><div class="sv">17.1</div><div class="sl">BMI</div></div>
+        <div class="stat-box"><div class="sv">3,200</div><div class="sl">kcal/day</div></div>
+      </div>
+    </div>
+
+    <div class="tip-card">
+      <div class="tip-title"><i class="ti ti-target" aria-hidden="true"></i> Daily targets</div>
+      <p>Calories: <strong>3,200 kcal</strong> &nbsp;·&nbsp; Protein: <strong>150g</strong> &nbsp;·&nbsp; Carbs: <strong>450g</strong> &nbsp;·&nbsp; Fat: <strong>90g</strong></p>
+    </div>
+
+    <div class="section-title">Weight gain progress</div>
+    <div class="profile-card">
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:8px;">
+        <span>43 kg (start)</span><span>65 kg (goal)</span>
+      </div>
+      <div class="progress-bar" style="height:10px;">
+        <div class="progress-fill" style="width:0%;background:#185FA5;height:10px;"></div>
+      </div>
+      <div style="font-size:12px;color:var(--text3);margin-top:8px;">Log your weight regularly to track progress</div>
+    </div>
+
+    <div class="section-title">Quick actions</div>
+    <button class="btn-full" onclick="goToScan()">
+      <i class="ti ti-calculator" aria-hidden="true"></i> Calculate calories of a meal
+    </button>
+    <button class="btn-full" onclick="goToPlan()">
+      <i class="ti ti-clipboard-list" aria-hidden="true"></i> Add food to today's plan
+    </button>
+  </div>
+
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  const MEALS = [
+    { id: 'breakfast', name: 'Breakfast', icon: 'ti-sun', items: [
+      { name: 'Oats with milk & banana', qty: '1 bowl', cals: 380, protein: 12, carbs: 68, fat: 8 },
+      { name: '2 boiled eggs', qty: '2 eggs', cals: 155, protein: 13, carbs: 1, fat: 11 }
+    ]},
+    { id: 'lunch', name: 'Lunch', icon: 'ti-tool-kitchen-2', items: [
+      { name: 'Chicken rice bowl', qty: '1 large', cals: 620, protein: 48, carbs: 72, fat: 14 }
+    ]},
+    { id: 'snack', name: 'Snack', icon: 'ti-apple', items: [
+      { name: 'Peanut butter toast', qty: '2 slices', cals: 290, protein: 10, carbs: 30, fat: 15 }
+    ]},
+    { id: 'dinner', name: 'Dinner', icon: 'ti-moon', items: [] }
+  ];
+
+  function getMealTotals(meal) {
+    return meal.items.reduce((a, i) => ({
+      cals: a.cals + i.cals,
+      protein: a.protein + i.protein,
+      carbs: a.carbs + i.carbs,
+      fat: a.fat + i.fat
+    }), { cals: 0, protein: 0, carbs: 0, fat: 0 });
+  }
+
+  function getDayTotals() {
+    return MEALS.reduce((a, m) => {
+      const t = getMealTotals(m);
+      return { cals: a.cals + t.cals, protein: a.protein + t.protein, carbs: a.carbs + t.carbs, fat: a.fat + t.fat };
+    }, { cals: 0, protein: 0, carbs: 0, fat: 0 });
+  }
+
+  function updateDashboard() {
+    const t = getDayTotals();
+    document.getElementById('eaten-cals').textContent = t.cals.toLocaleString();
+    const pct = Math.min(100, Math.round((t.cals / 3200) * 100));
+    document.getElementById('cal-progress').style.width = pct + '%';
+    const rem = 3200 - t.cals;
+    document.getElementById('cal-remaining').textContent = rem > 0
+      ? rem.toLocaleString() + ' kcal remaining today'
+      : '🎉 Daily calorie goal reached!';
+    document.getElementById('d-protein').textContent = t.protein + 'g';
+    document.getElementById('d-carbs').textContent = t.carbs + 'g';
+    document.getElementById('d-fat').textContent = t.fat + 'g';
+    document.getElementById('p-bar').style.width = Math.min(100, Math.round((t.protein / 150) * 100)) + '%';
+    document.getElementById('c-bar').style.width = Math.min(100, Math.round((t.carbs / 450) * 100)) + '%';
+    document.getElementById('f-bar').style.width = Math.min(100, Math.round((t.fat / 90) * 100)) + '%';
+
+    const dmDiv = document.getElementById('dashboard-meals');
+    const withItems = MEALS.filter(m => m.items.length > 0);
+    if (withItems.length === 0) {
+      dmDiv.innerHTML = '<p style="font-size:13px;color:var(--text3);text-align:center;padding:16px;">No meals logged yet — go to Meal Plan to add food.</p>';
+      return;
+    }
+    dmDiv.innerHTML = withItems.map(m => {
+      const mt = getMealTotals(m);
+      return `<div class="meal-block">
+        <div class="meal-header">
+          <span class="meal-name"><i class="ti ${m.icon}" aria-hidden="true"></i> ${m.name}</span>
+          <span class="meal-cal">${mt.cals} kcal</span>
+        </div>
+        <div class="meal-items">
+          ${m.items.map(i => `<div class="meal-item">
+            <div><div class="item-name">${i.name}</div><div class="item-meta">${i.qty} · P:${i.protein}g C:${i.carbs}g F:${i.fat}g</div></div>
+            <span class="item-cal">${i.cals}</span>
+          </div>`).join('')}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function renderMealPlan() {
+    const div = document.getElementById('meal-plan-blocks');
+    div.innerHTML = MEALS.map(meal => {
+      const mt = getMealTotals(meal);
+      return `<div class="meal-block">
+        <div class="meal-header">
+          <span class="meal-name"><i class="ti ${meal.icon}" aria-hidden="true"></i> ${meal.name}</span>
+          <span class="meal-cal">${mt.cals} kcal</span>
+        </div>
+        <div class="meal-items" id="items-${meal.id}">
+          ${meal.items.length === 0
+            ? '<p class="empty-msg">No items yet — add something below</p>'
+            : meal.items.map((item, idx) => `
+              <div class="meal-item">
+                <div>
+                  <div class="item-name">${item.name}</div>
+                  <div class="item-meta">${item.qty} · P:${item.protein}g C:${item.carbs}g F:${item.fat}g</div>
+                </div>
+                <div style="display:flex;align-items:center;">
+                  <span class="item-cal">${item.cals}</span>
+                  <button class="delete-btn" onclick="removeItem('${meal.id}',${idx})" aria-label="Remove item">
+                    <i class="ti ti-x" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>`).join('')}
+        </div>
+        <div class="add-row">
+          <input type="text" id="input-${meal.id}" placeholder="Add food..." onkeydown="if(event.key==='Enter')quickAdd('${meal.id}')" />
+          <button class="btn-sm" onclick="quickAdd('${meal.id}')">Add</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function removeItem(mealId, idx) {
+    const meal = MEALS.find(m => m.id === mealId);
+    if (meal) { meal.items.splice(idx, 1); renderMealPlan(); updateDashboard(); }
+  }
+
+  function quickAdd(mealId) {
+    const input = document.getElementById('input-' + mealId);
+    const val = input.value.trim();
+    if (!val) return;
+    const meal = MEALS.find(m => m.id === mealId);
+    meal.items.push({ name: val, qty: '1 serving', cals: 200, protein: 8, carbs: 25, fat: 6 });
+    input.value = '';
+    renderMealPlan();
+    updateDashboard();
+    showToast('Added to ' + meal.name);
+  }
+
+  function saveApiKey() {
+    const key = document.getElementById('api-key-input').value.trim();
+    if (key) localStorage.setItem('ng_api_key', key);
+  }
+
+  function getApiKey() {
+    return localStorage.getItem('ng_api_key') || document.getElementById('api-key-input').value.trim();
+  }
+
+  async function analyzeMeal() {
+    const input = document.getElementById('food-input').value.trim();
+    if (!input) { showToast('Please describe your meal first'); return; }
+    const apiKey = getApiKey();
+    if (!apiKey) { showToast('Please enter your API key first'); return; }
+
+    const btn = document.getElementById('analyze-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
+    document.getElementById('scan-result').innerHTML = '';
+
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 1000,
+          messages: [{
+            role: 'user',
+            content: `You are a nutrition expert. Analyze this food/meal and give calorie and macro estimates for a person trying to gain weight.
+
+Food: "${input}"
+
+Respond ONLY with a JSON object (no markdown, no backticks, no explanation) in this exact format:
+{
+  "foodName": "name of the food or meal",
+  "quantity": "estimated serving size",
+  "calories": 350,
+  "protein": 25,
+  "carbs": 40,
+  "fat": 12,
+  "fiber": 5,
+  "tags": ["high-protein", "good for weight gain"],
+  "tip": "one short tip about this food for healthy weight gain"
+}`
+          }]
+        })
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error?.message || 'API error');
+      }
+
+      const data = await res.json();
+      let text = data.content.map(b => b.text || '').join('');
+      text = text.replace(/```json|```/g, '').trim();
+      const info = JSON.parse(text);
+
+      document.getElementById('scan-result').innerHTML = `
+        <div class="result-card">
+          <div class="result-head">
+            <i class="ti ti-leaf" aria-hidden="true"></i>
+            <div>
+              <div class="food-name">${escHtml(info.foodName)}</div>
+              <div class="food-qty">${escHtml(info.quantity)}</div>
+            </div>
+            <div style="text-align:right;margin-left:auto;">
+              <div class="total-cal">${info.calories}</div>
+              <div class="cal-lbl">kcal</div>
+            </div>
+          </div>
+          <div class="macro-row">
+            <div class="macro-pill"><div class="mp-val">${info.protein}g</div><div class="mp-lbl">Protein</div></div>
+            <div class="macro-pill"><div class="mp-val">${info.carbs}g</div><div class="mp-lbl">Carbs</div></div>
+            <div class="macro-pill"><div class="mp-val">${info.fat}g</div><div class="mp-lbl">Fat</div></div>
+            <div class="macro-pill"><div class="mp-val">${info.fiber}g</div><div class="mp-lbl">Fiber</div></div>
+          </div>
+          <div style="padding:0 14px 8px;">
+            ${(info.tags || []).map(t => `<span class="tag tag-green">${escHtml(t)}</span>`).join('')}
+          </div>
+          <div class="result-tip">${escHtml(info.tip)}</div>
+          <div class="action-row">
+            <button class="btn-add" onclick="addToMeal('breakfast','${escAttr(info.foodName)}','${escAttr(info.quantity)}',${info.calories},${info.protein},${info.carbs},${info.fat})">
+              <i class="ti ti-plus" aria-hidden="true"></i> Add to Breakfast
+            </button>
+            <button class="btn-add lunch" onclick="addToMeal('lunch','${escAttr(info.foodName)}','${escAttr(info.quantity)}',${info.calories},${info.protein},${info.carbs},${info.fat})">
+              <i class="ti ti-plus" aria-hidden="true"></i> Add to Lunch
+            </button>
+          </div>
+        </div>`;
+
+    } catch(e) {
+      document.getElementById('scan-result').innerHTML = `<div style="background:var(--surface);border-radius:var(--radius);border:0.5px solid var(--border);padding:14px;font-size:13px;color:#A32D2D;">
+        Could not analyze: ${escHtml(e.message)}. Check your API key and try again.</div>`;
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ti ti-calculator" aria-hidden="true"></i> Calculate calories';
+  }
+
+  function addToMeal(mealId, name, qty, cals, protein, carbs, fat) {
+    const meal = MEALS.find(m => m.id === mealId);
+    if (meal) {
+      meal.items.push({ name, qty, cals, protein, carbs, fat });
+      renderMealPlan();
+      updateDashboard();
+      showToast('Added to ' + meal.name + '!');
+    }
+  }
+
+  function showTab(tab) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('screen-' + tab).classList.add('active');
+    document.getElementById('nav-' + tab).classList.add('active');
+  }
+
+  function goToScan() { showTab('scan'); }
+  function goToPlan() { showTab('plan'); }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function escAttr(str) {
+    return String(str).replace(/'/g,"\\'");
+  }
+
+  // Load saved API key
+  const savedKey = localStorage.getItem('ng_api_key');
+  if (savedKey) {
+    document.getElementById('api-key-input').value = savedKey;
+    document.getElementById('api-setup').style.display = 'none';
+  }
+
+  renderMealPlan();
+  updateDashboard();
+</script>
+</body>
+</html>
